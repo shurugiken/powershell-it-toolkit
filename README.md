@@ -30,3 +30,100 @@ Every script supports `-WhatIf` where it makes changes. Start there:
 ```powershell
 .\scripts\Disable-DepartedUser.ps1 -UserPrincipalName jdoe@example.com -WhatIf
 ```
+
+## Example output
+
+All samples below are **illustrative** — generated from realistic values to show the format the scripts actually produce. Real output reflects the machine or tenant it runs against.
+
+---
+
+### `Get-SystemHealthReport.ps1` (illustrative)
+
+```
+===== MEMORY =====
+Total RAM:            16.0 GB
+Free RAM:              2.3 GB
+RAM in use:            86 %
+Commit charge:        18.4 / 24.0 GB  (77% of commit limit)
+
+===== RAM MODULES / SLOTS =====
+  DIMM-A1         8 GB  3200 MT/s  CT8G4DFS832A
+  DIMM-B1         8 GB  3200 MT/s  CT8G4DFS832A
+  Slots: 2 populated / 4 total   Max supported: 64 GB
+  -> 2 free slot(s): RAM is upgradeable without removing existing sticks.
+
+===== PHYSICAL DISKS (health) =====
+  Samsung SSD 870 EVO 500GB    SSD   Health=Healthy  465 GB  bus=SATA
+  WDC WD10EZEX-08WN4A0         HDD   Health=Healthy  931 GB  bus=SATA
+
+===== VOLUMES (free space) =====
+  C:     11.4 GB free /   465.0 GB  ( 2.5% free)  ! low
+  D:    412.7 GB free /   931.4 GB  (44.3% free)
+
+===== PAGE FILE =====
+  C:\pagefile.sys  allocated= 7.9 GB  peak= 5.2 GB  current= 4.1 GB
+
+===== TOP RAM CONSUMERS =====
+  chrome                        1 842 MB
+  MsMpEng                         412 MB
+  Code                            389 MB
+  SearchIndexer                   201 MB
+  svchost                         177 MB
+  explorer                        134 MB
+  ...
+
+===== EVENT-LOG ISSUES (last 30 days, filtered by source) =====
+      0  Low-memory (Resource-Exhaustion 2004)
+      0  Hard freezes / dirty shutdowns (Kernel-Power 41)
+      0  Bugchecks / BSOD
+      2  Real disk / NTFS errors (by source)
+      3  App crashes (1000)       0  App hangs (1002)
+
+===== VERDICT =====
+  * No single dominant issue detected in this window.
+```
+
+> The `C:` volume flagged `! low` because it is below 15% free. No memory-pressure events were found, so the VERDICT stays clean — this is a space problem, not a RAM problem.
+
+---
+
+### `New-EmployeeOnboarding.ps1` (illustrative)
+
+```powershell
+.\scripts\New-EmployeeOnboarding.ps1 `
+    -DisplayName "Jane Doe" `
+    -UserPrincipalName jdoe@example.com `
+    -Department "Accounting" `
+    -JobTitle "Staff Accountant" `
+    -Groups "Accounting","All-Staff"
+```
+
+```
+--- Onboarding summary (paste into the ticket) ---
+
+Name         : Jane Doe
+UPN          : jdoe@example.com
+Department   : Accounting
+Title        : Staff Accountant
+License      : ENTERPRISEPACK
+Groups       : Accounting, All-Staff
+TempPassword : rK7mNq3BvXpL2w
+MustReset    : True
+```
+
+The `Format-List` block is designed to be copied directly into the help-desk ticket so there is a clean audit record of exactly what was provisioned.
+
+---
+
+### `Clear-WindowsCaches.ps1` (illustrative)
+
+```
+  cleared: C:\Users\jdoe\AppData\Local\Temp
+  cleared: C:\Users\jdoe\AppData\Local\Google\Chrome\User Data\Default\Cache
+  cleared: C:\Users\jdoe\AppData\Local\Google\Chrome\User Data\Default\Code Cache
+  cleared: C:\Users\jdoe\AppData\Local\Microsoft\Edge\User Data\Default\Cache
+
+Freed: 3 241 MB   |   C:: 14.6 GB free
+```
+
+Locked files (held open by a running browser) are skipped silently — close Chrome and Edge first to maximise the reclaim.
